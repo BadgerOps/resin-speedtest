@@ -12,7 +12,8 @@ class SpeedTestCheck(object):
 
     def setLCD(self, color):
         self.lcd.clear()
-        self.lcd.backlight(self.lcd.%s % color)
+        b_color = self.lcd."{}".format(color)
+        self.lcd.backlight(b_color)
 
     def setup(self):
         self.lcd = Adafruit_CharLCDPlate()
