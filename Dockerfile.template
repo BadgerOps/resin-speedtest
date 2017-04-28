@@ -7,8 +7,9 @@ RUN echo i2c-dev >> /etc/modules
 
 RUN apt-get update && \
 apt-get install -y python python-pip python-smbus i2c-tools python-dev build-essential && \
+pip install -U setuptools && \
 pip install speedtest-cli && \
-LC_ALL=C pip install -U RPi.Gpio &&  \
+LC_ALL=C pip install RPi.Gpio &&  \
 rm -rf /var/lib/apt/lists/*
 
 COPY . /app
