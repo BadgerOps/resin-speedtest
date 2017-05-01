@@ -6,7 +6,7 @@ RUN echo i2c-bcm2708 >> /etc/modules
 RUN echo i2c-dev >> /etc/modules
 
 RUN apt-get update && \
-apt-get install -y build-essential python-dev python-smbus python-pip i2c-tools
+apt-get install -y build-essential python-dev python-smbus python-pip
 
 RUN pip install -U setuptools speedtest-cli && \
 pip install Adafruit-CharLCD && \
