@@ -18,7 +18,7 @@ class SpeedTestCheck(object):
         """
         Set up initial requirements, create self.lcd by instantiating the CharLCDPlate
         set default color of plate
-        :return: 
+        :return:
         """
         print "running setup"
         #pass
@@ -34,7 +34,7 @@ class SpeedTestCheck(object):
     def schedule_jobs(self):
         """
         Schedule jobs to run. For now its just 'checkspeed()'
-        :return: 
+        :return:
         """
         schedule.every(60).minutes.do(self.checkspeed)
 
@@ -105,7 +105,7 @@ class SpeedTestCheck(object):
     def main(self):
         """
         Run the thing!
-        :return: 
+        :return:
         """
         self.setup()
         self.schedule_jobs()
@@ -123,6 +123,7 @@ class SpeedTestCheck(object):
                     if button[1] == 'run speedtest':
                         self.checkspeed()
                         self.printspeed()
+                        return
                     self.lcd.message(button[1])
                     self.lcd.set_color(button[2][0], button[2][1], button[2][2])
 
