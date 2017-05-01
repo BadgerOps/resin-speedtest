@@ -122,6 +122,7 @@ class SpeedTestCheck(object):
                     self.lcd.clear()
                     if button[1] == 'run speedtest':
                         self.checkspeed()
+                        self.printspeed()
                     self.lcd.message(button[1])
                     self.lcd.set_color(button[2][0], button[2][1], button[2][2])
 
