@@ -70,6 +70,7 @@ class LcdPlate(threading.Thread):
                 for button in self.lcd_buttons:
                     if self.lcd.is_pressed(button[0]):
                         self.lcd.set_color(button[2][0], button[2][1], button[2][2])
+                        self.buttons(button[1])
 
             except Exception as e:
                 print 'Exception in LCD Loop: {0}'.format(e)
