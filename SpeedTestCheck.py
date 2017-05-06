@@ -4,33 +4,20 @@
 import speedtest
 import schedule
 import time
-import Adafruit_CharLCD as LCD
+import libs
+import logging
 
 class SpeedTestCheck(object):
 
     def __init__(self):
-        self.previous = {'up': 1, 'down': 1, 'ping': 1, 'server': None}
-        self.current = {'up': 1, 'down': 1, 'ping': 1, 'server': None}
-        self.lcd_buttons = None
+        self.previous = {}
+        self.current = {}
         self.messages = {}
 
-    def setup(self):
-        """
-        Set up initial requirements, create self.lcd by instantiating the CharLCDPlate
-        set default color of plate
-        :return:
-        """
-        print "running setup"
-        #pass
-        self.lcd = LCD.Adafruit_CharLCDPlate()
-        self.lcd.clear()
-        self.lcd.message("Setting up...")
-        self.lcd.set_color(1.0, 0.0, 1.0)
-        self.generate_messages()
-        self.lcd_buttons = self.buttons(self.messages)
-
-        print "setup complete"
-
+    def setup_logging(self):
+        logging.basicConfig(level=logging.DEBUG,
+                            format='(%(threadName)-10s) %(message)s',
+                            )
     def schedule_jobs(self):
         """
         Schedule jobs to run. For now its just 'checkspeed()'
@@ -52,8 +39,8 @@ class SpeedTestCheck(object):
         speedtest against a local speedtest.net server
         """
         print "running speedtest"
-        self.lcd.clear()
-        self.lcd.message("Checking Speed")
+        self.lcd.lcd.clear()
+        self.lcd.lcd.message("Checking Speed")
         self.previous = self.current # keep 1 previous speedtest attempt
         print self.previous
         servers = []
@@ -68,14 +55,14 @@ class SpeedTestCheck(object):
 
     def printspeed(self):
         if self.current['down'] > 35:
-            self.lcd.clear()
-            self.lcd.set_color(0.0, 1.0, 0.0)
+            self.lcd.lcd.clear()
+            self.lcd.lcd.set_color(0.0, 1.0, 0.0)
         elif self.current['down'] < 35:
-            self.lcd.clear()
-            self.lcd.set_color(1.0, 0.0, 0.0)
+            self.lcd.lcd.clear()
+            self.lcd.lcd.set_color(1.0, 0.0, 0.0)
         msg1 = "Down: {0} Mb/s".format(self.current['down']) + '\n' + "Up: {0} Mb/s".format(
             self.current['up'])
-        self.lcd.message(msg1)
+        self.lcd.lcd.message(msg1)
 
     def set_current(self, results):
         print 'updating current speed values'
@@ -87,46 +74,37 @@ class SpeedTestCheck(object):
             'timestamp': results['timestamp']
         }
 
-    def buttons(self, messages):
-        buttons = ((LCD.SELECT, 'run speedtest', (1, 1, 1)),
-               (LCD.LEFT, '{}'.format(messages['prev']), (1, 0, 0)),
-               (LCD.UP, 'not used yet', (0, 0, 1)),
-               (LCD.DOWN, '{}'.format(messages['server']), (0, 1, 0)),
-               (LCD.RIGHT, '{}'.format(messages['curr']), (1, 0, 1)))
-        return buttons
-
     def generate_messages(self):
         self.messages = {
-            'prev': "Previous Speed: \n Down: {} Up: {}".format(self.previous['down'], self.previous['up']),
-            'curr': "Current Speed: \n Down: {} Up: {}".format(self.current['down'], self.current['up']),
-            'server': "Server: {}".format(self.current['server']),
+            'prev': "Previous Speed: \n Down: {0} Up: {1}".format(self.previous['down'], self.previous['up']),
+            'curr': "Current Speed: \n Down: {0} Up: {1}".format(self.current['down'], self.current['up']),
+            'server': "Server: {0}".format(self.current['server']),
         }
+
+    def start_plate(self):
+        """
+        Start the LCD plate up
+        :return: 
+        """
+        self.lcd = libs.LcdPlate(self)
+        self.lcd.setDaemon(True)
+        self.lcd.start()
 
     def main(self):
         """
         Run the thing!
         :return:
         """
-        self.setup()
+        self.setup_logging()
         self.schedule_jobs()
+        self.start_plate()
         print "entering main loop"
-        self.lcd.clear()
-        self.lcd.message("main loop")
+        self.lcd.lcd.clear()
+        self.lcd.lcd.message("main loop")
         self.checkspeed()
         while True:
             schedule.run_pending()
-            self.generate_messages()
             time.sleep(1)
-            for button in self.lcd_buttons:
-                if self.lcd.is_pressed(button[0]):
-                    self.lcd.clear()
-                    if button[1] == 'run speedtest':
-                        self.checkspeed()
-                        self.printspeed()
-                        return
-                    self.lcd.message(button[1])
-                    self.lcd.set_color(button[2][0], button[2][1], button[2][2])
-
 
 
 if __name__ == '__main__':
