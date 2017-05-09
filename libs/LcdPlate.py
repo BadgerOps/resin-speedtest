@@ -18,6 +18,13 @@ class LcdPlate(threading.Thread):
         self.setup()
         self.primary_ip = self.getprimaryip()
         self.buttons = [ LCD.SELECT, LCD.LEFT, LCD.UP, LCD.DOWN, LCD.RIGHT ]
+        self.func_matrix = {
+            LCD.SELECT: self.sc.printspeed,
+            LCD.LEFT: self.print_screen,
+            LCD.UP: self.print_screen,
+            LCD.DOWN: self.print_screen,
+            LCD.RIGHT: self.print_screen
+        }
 
     def setup(self):
         """
@@ -26,27 +33,27 @@ class LcdPlate(threading.Thread):
         :return:
         """
         print "running plate setup"
-        #pass
         self.lcd = LCD.Adafruit_CharLCDPlate()
         self.lcd.clear()
         self.lcd.message("Setting up...")
         self.lcd.set_color(1.0, 0.0, 1.0)
 
-    def button_matrix(self, button, messages):
-        buttons = ((LCD.SELECT, self.sc.printspeed(), (1, 1, 1)),
-               (LCD.LEFT, self.print_screen('{0}'.format(messages['prev'])), (1, 0, 0)),
-               (LCD.UP, self.print_screen('primary IP is: \n {0}'.format(self.primary_ip)), (0, 0, 1)),
-               (LCD.DOWN, self.print_screen('{0}'.format(messages['server'])), (0, 1, 0)),
-               (LCD.RIGHT, self.print_screen('{0}'.format(messages['curr'])), (1, 0, 1)))
-        return buttons
+    def button_matrix(self, button):
+        matrix = {
+            LCD.LEFT: "prev",
+            LCD.UP: "",
+            LCD.DOWN: "server",
+            LCD.RIGHT: "curr"
+        }
+        return matrix[button]
 
-    def print_screen(self, content):
+    def print_screen(self, msg):
         """
         Print a message to the screen based on the content given
         :param content:  
         """
         self.lcd.clear()
-        self.lcd.message(content)
+        self.lcd.message('{0}'.format(self.sc.messages[msg]))
 
     def getprimaryip(self):
         """
@@ -73,14 +80,12 @@ class LcdPlate(threading.Thread):
                     time.sleep(5)
                     pass
                 else:
-                    time.sleep(0.1) # dont run away...
-                    #self.lcd_buttons = self.buttons(self.sc.messages)  # refresh buttons
+                    time.sleep(0.1) # don't run away...
                     for b in self.buttons:
                         if self.lcd.is_pressed(b):
-                            button = self.button_matrix(b, self.sc.messages)
-                            self.lcd.clear()
-                            self.lcd.set_color(button[2][0], button[2][1], button[2][2])
-                            self.buttons(button[1])
-
+                            if b != 0: # don't run this for 'select'
+                                self.func_matrix[b](self.button_matrix(b))
+                            elif b == 0:
+                                self.func_matrix[b]()
             except Exception as e:
                 print 'Exception in LCD Loop: {0}'.format(e, exc_info=1)
