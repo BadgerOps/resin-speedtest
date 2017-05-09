@@ -16,10 +16,9 @@ class LcdPlate(threading.Thread):
         threading.Thread.__init__(self)
         self.lcd_buttons = None
         self.setup()
-        self.primary_ip = self.getprimaryip()
         self.buttons = [ LCD.SELECT, LCD.LEFT, LCD.UP, LCD.DOWN, LCD.RIGHT ]
         self.func_matrix = {
-            LCD.SELECT: self.sc.printspeed,
+            LCD.SELECT: self.sc.checkspeed,
             LCD.LEFT: self.print_screen,
             LCD.UP: self.print_screen,
             LCD.DOWN: self.print_screen,
@@ -37,11 +36,12 @@ class LcdPlate(threading.Thread):
         self.lcd.clear()
         self.lcd.message("Setting up...")
         self.lcd.set_color(1.0, 0.0, 1.0)
+        self.lc.messages['ip_addr'] = self.getprimaryip()
 
     def button_matrix(self, button):
         matrix = {
             LCD.LEFT: "prev",
-            LCD.UP: "",
+            LCD.UP: "ip_addr",
             LCD.DOWN: "server",
             LCD.RIGHT: "curr"
         }
