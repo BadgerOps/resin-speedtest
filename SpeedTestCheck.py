@@ -10,9 +10,10 @@ import logging
 class SpeedTestCheck(object):
 
     def __init__(self):
-        self.previous = {}
-        self.current = {}
+        self.previous = {'up': 1, 'down': 1, 'ping': 1, 'server': None}
+        self.current = {'up': 1, 'down': 1, 'ping': 1, 'server': None}
         self.messages = {}
+        self.running = False
 
     def setup_logging(self):
         logging.basicConfig(level=logging.DEBUG,
@@ -39,8 +40,8 @@ class SpeedTestCheck(object):
         speedtest against a local speedtest.net server
         """
         print "running speedtest"
-        self.lcd.lcd.clear()
-        self.lcd.lcd.message("Checking Speed")
+        self.plate.lcd.clear()
+        self.plate.lcd.message("Checking Speed")
         self.previous = self.current # keep 1 previous speedtest attempt
         print self.previous
         servers = []
@@ -51,18 +52,19 @@ class SpeedTestCheck(object):
         s.upload()
 
         self.set_current(s.results.dict())
+        self.generate_messages()
         self.printspeed()
 
     def printspeed(self):
         if self.current['down'] > 35:
-            self.lcd.lcd.clear()
-            self.lcd.lcd.set_color(0.0, 1.0, 0.0)
+            self.plate.lcd.clear()
+            self.plate.lcd.set_color(0.0, 1.0, 0.0)
         elif self.current['down'] < 35:
-            self.lcd.lcd.clear()
-            self.lcd.lcd.set_color(1.0, 0.0, 0.0)
+            self.plate.lcd.clear()
+            self.plate.lcd.set_color(1.0, 0.0, 0.0)
         msg1 = "Down: {0} Mb/s".format(self.current['down']) + '\n' + "Up: {0} Mb/s".format(
             self.current['up'])
-        self.lcd.lcd.message(msg1)
+        self.plate.lcd.message(msg1)
 
     def set_current(self, results):
         print 'updating current speed values'
@@ -86,22 +88,24 @@ class SpeedTestCheck(object):
         Start the LCD plate up
         :return: 
         """
-        self.lcd = libs.LcdPlate(self)
-        self.lcd.setDaemon(True)
-        self.lcd.start()
+        self.plate = libs.LcdPlate(self)
+        self.plate.setDaemon(True)
+        self.plate.start()
 
     def main(self):
         """
         Run the thing!
         :return:
         """
-        self.setup_logging()
-        self.schedule_jobs()
+        #self.setup_logging()
         self.start_plate()
+        self.schedule_jobs()
         print "entering main loop"
-        self.lcd.lcd.clear()
-        self.lcd.lcd.message("main loop")
+        self.plate.lcd.clear()
+        self.plate.lcd.message("main loop")
         self.checkspeed()
+        self.generate_messages()
+        self.running = True
         while True:
             schedule.run_pending()
             time.sleep(1)
