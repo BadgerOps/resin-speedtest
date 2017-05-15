@@ -36,7 +36,7 @@ class LcdPlate(threading.Thread):
         self.lcd.clear()
         self.lcd.message("Setting up...")
         self.lcd.set_color(1.0, 0.0, 1.0)
-        self.lc.messages['ip_addr'] = self.getprimaryip()
+        self.lcd.messages['ip_addr'] = self.getprimaryip()
 
     def button_matrix(self, button):
         matrix = {
@@ -50,7 +50,7 @@ class LcdPlate(threading.Thread):
     def print_screen(self, msg):
         """
         Print a message to the screen based on the content given
-        :param content:  
+        :param content:
         """
         self.lcd.clear()
         self.lcd.message('{0}'.format(self.sc.messages[msg]))
@@ -59,7 +59,7 @@ class LcdPlate(threading.Thread):
         """
         We can't know for sure that /etc/hosts is set up properly, so socket.gethostbyname() isn't guaranteed.
         This is an adaptation of a Salt grain I wrote to do the same thing.
-        :return str: 
+        :return str:
         """
         with os.popen("ip route | grep default | grep -Eo 'dev\s+\w+' | awk '{print $2}'") as defroute_device_pipe:
             def_route = defroute_device_pipe.read().strip()
