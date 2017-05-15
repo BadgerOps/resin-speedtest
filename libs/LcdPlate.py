@@ -36,7 +36,7 @@ class LcdPlate(threading.Thread):
         self.lcd.clear()
         self.lcd.message("Setting up...")
         self.lcd.set_color(1.0, 0.0, 1.0)
-        self.lcd.messages['ip_addr'] = self.getprimaryip()
+        self.sc.messages['ip_addr'] = self.getprimaryip()
 
     def button_matrix(self, button):
         matrix = {
