@@ -74,6 +74,7 @@ class SpeedTestCheck(object):
             'ping': int(results['ping']),
             'server': results['server']['id'],
             'timestamp': results['timestamp']
+
         }
 
     def generate_messages(self):
@@ -81,12 +82,13 @@ class SpeedTestCheck(object):
             'prev': "Previous Speed: \n Down: {0} Up: {1}".format(self.previous['down'], self.previous['up']),
             'curr': "Current Speed: \n Down: {0} Up: {1}".format(self.current['down'], self.current['up']),
             'server': "Server: {0}".format(self.current['server']),
+            'ip_addr': self.lcd.getprimaryip()
         }
 
     def start_plate(self):
         """
         Start the LCD plate up
-        :return: 
+        :return:
         """
         self.plate = libs.LcdPlate(self)
         self.plate.setDaemon(True)
