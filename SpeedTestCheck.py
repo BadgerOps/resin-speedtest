@@ -82,7 +82,7 @@ class SpeedTestCheck(object):
             'prev': "Previous Speed: \n Down: {0} Up: {1}".format(self.previous['down'], self.previous['up']),
             'curr': "Current Speed: \n Down: {0} Up: {1}".format(self.current['down'], self.current['up']),
             'server': "Server: {0}".format(self.current['server']),
-            'ip_addr': self.plate.getprimaryip()
+            'ip_addr': "IP Address is: \n {0}".format(self.plate.getprimaryip())
         }
 
     def start_plate(self):
