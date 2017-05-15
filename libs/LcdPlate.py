@@ -15,7 +15,7 @@ class LcdPlate(threading.Thread):
         self.sc = SpeedTestCheck
         threading.Thread.__init__(self)
         self.lcd_buttons = None
-        self.sc.messages['ip_addr'] = 1.2.3.4
+        self.sc.messages['ip_addr'] = '1.2.3.4'
         self.setup()
         self.buttons = [ LCD.SELECT, LCD.LEFT, LCD.UP, LCD.DOWN, LCD.RIGHT ]
         self.func_matrix = {
