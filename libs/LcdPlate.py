@@ -83,9 +83,6 @@ class LcdPlate(threading.Thread):
                     time.sleep(0.1) # don't run away...
                     for b in self.buttons:
                         if self.lcd.is_pressed(b):
-                            if b != 0: # don't run this for 'select'
-                                self.func_matrix[b](self.button_matrix(b))
-                            elif b == 0:
-                                self.func_matrix[b]()
+                            self.func_matrix[b](self.button_matrix(b))
             except Exception as e:
                 print 'Exception in LCD Loop: {0}'.format(e, exc_info=1)
