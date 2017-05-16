@@ -10,6 +10,7 @@ import logging
 class SpeedTestCheck(object):
 
     def __init__(self):
+        self.netspeed = {'up': 20, 'down': 40 }
         self.previous = {'up': 1, 'down': 1, 'ping': 1, 'server': None}
         self.current = {'up': 1, 'down': 1, 'ping': 1, 'server': None}
         self.messages = {}
@@ -56,10 +57,10 @@ class SpeedTestCheck(object):
         self.printspeed()
 
     def printspeed(self):
-        if self.current['down'] > 35:
+        if self.current['down'] > self.netspeed['down']:
             self.plate.lcd.clear()
             self.plate.lcd.set_color(0.0, 1.0, 0.0)
-        elif self.current['down'] < 35:
+        elif self.current['down'] < self.netspeed['down']:
             self.plate.lcd.clear()
             self.plate.lcd.set_color(1.0, 0.0, 0.0)
         msg1 = "Down: {0} Mb/s".format(self.current['down']) + '\n' + "Up: {0} Mb/s".format(
