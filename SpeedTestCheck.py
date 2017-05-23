@@ -10,7 +10,8 @@ import logging
 class SpeedTestCheck(object):
 
     def __init__(self):
-        self.netspeed = {'up': 20, 'down': 40 }
+        # change the self.netspeed values to reflect your up/down
+        self.netspeed = {'up': 20, 'down': 40, 'updiff': 20, 'downdiff': 40 }
         self.previous = {'up': 1, 'down': 1, 'ping': 1, 'server': None}
         self.current = {'up': 1, 'down': 1, 'ping': 1, 'server': None}
         self.messages = {}
@@ -20,6 +21,7 @@ class SpeedTestCheck(object):
         logging.basicConfig(level=logging.DEBUG,
                             format='(%(threadName)-10s) %(message)s',
                             )
+
     def schedule_jobs(self):
         """
         Schedule jobs to run. For now its just 'checkspeed()'
@@ -56,11 +58,27 @@ class SpeedTestCheck(object):
         self.generate_messages()
         self.printspeed()
 
+    def calculate_speed(self):
+        """
+        We'll calculate a reasonable difference between the stated up/down speed
+        in self.netspeed. We'll then use this to set LCD color based on the differential.
+        """
+        downdiff = self.netspeed['down'] - self.netspeed['down'] * .10
+        self.netspeed['downdiff'] = downdiff
+        updiff = self.netspeed['up'] - self.netspeed['up'] *.10
+        self.netspeed['updiff'] = updiff
+
     def printspeed(self):
-        if self.current['down'] > self.netspeed['down']:
+        """
+        We'll print the speed out to the plate LCD, and change the color based
+        off of the deltas calculated in self.calculate_speed
+        """
+        # first run the calculation
+        self.calculate_speed()
+        if self.current['down'] > self.netspeed['downdiff']:
             self.plate.lcd.clear()
             self.plate.lcd.set_color(0.0, 1.0, 0.0)
-        elif self.current['down'] < self.netspeed['down']:
+        elif self.current['down'] < self.netspeed['downdiff']:
             self.plate.lcd.clear()
             self.plate.lcd.set_color(1.0, 0.0, 0.0)
         msg1 = "Down: {0} Mb/s".format(self.current['down']) + '\n' + "Up: {0} Mb/s".format(
